@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IIC — Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* =========================================
+       1. GLOBAL VARIABLES & THEME
+       ========================================= */
+    :root{
+      --navy:#2E2A8F;
+      --orange:#F4A238;
+      --red:#D92E2E;
+      --purple:#6B5BA8;
+      --bg:#FAF9F7;
+      --card-bg:#FFFFFF;
+      --muted:#6b6b6b;
+      --border:#E8E7E3;
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;scroll-behavior:smooth}
+    a{color:inherit;text-decoration:none}
+
+    /* ==== BACKGROUND LOGO WATERMARK ==== */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.02) 100%),
+        url("images/IIC.png") center/500px auto no-repeat;
+      opacity:0.15;
+      z-index:-1;
+      transform:translateZ(0);
+      pointer-events: none;
+    }
+
+    .wrap{
+      width:100vw;
+      margin:0;
+      padding:0;
+      background: transparent !important;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* =========================================
+       2. HEADER
+       ========================================= */
+    header{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px 40px 20px 40px;
+      margin-bottom:0;
+      position:relative;
+      background:transparent !important;
+      z-index:100;
+      box-shadow:none;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+      gap: 48px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:700;
+      font-size:18px;
+      color:var(--navy)
+    }
+    .brand img{
+      height:40px;
+      width:auto;
+      display:block;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.02));
+    }
+    nav{
+      display:flex;
+      gap:32px;
+      align-items:center
+    }
+    nav a{
+      font-size:14px;
+      color:var(--muted);
+      transition:color .2s ease;
+      font-weight:500
+    }
+    nav a:hover{color:var(--navy)}
+    @media(max-width:768px){
+      nav{display:none}
+      header{padding:16px 0;margin-bottom:8px}
+      .brand{font-size:16px}
+      .header-inner{justify-content: flex-start; padding: 0 20px;}
+    }
+
+    main{max-width:1400px;margin:auto;padding:40px 20px 60px;width: 100%;}
+
+    /* HERO SECTION */
+    .hero-gallery{
+      text-align:center;
+      margin-bottom:60px;
+      padding:50px 30px;
+      background:rgba(255,255,255,0.6); 
+      backdrop-filter: blur(5px);
+      border-radius:var(--radius);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .hero-gallery h1{
+      font-size:48px;
+      font-weight:700;
+      margin:0 0 16px;
+      background:linear-gradient(135deg,var(--navy),var(--purple));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    .hero-gallery p{
+      font-size:18px;
+      color:var(--muted);
+      max-width:700px;
+      margin:0 auto;
+      line-height:1.6;
+    }
+
+    @media(max-width:768px){
+      .hero-gallery{padding:30px 15px;margin-bottom:40px}
+      .hero-gallery h1{font-size:32px}
+      .hero-gallery p{font-size:16px}
+    }
+
+    /* FILTER TABS */
+    .filter-container{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      margin-bottom:60px;
+      flex-wrap:wrap;
+    }
+
+    .filter-btn{
+      background:rgba(255,255,255,0.8);
+      border:1px solid var(--border);
+      color:var(--muted);
+      padding:10px 26px;
+      border-radius:999px;
+      font-weight:600;
+      font-size:14px;
+      cursor:pointer;
+      transition:all .3s ease;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .filter-btn.active{
+      background:linear-gradient(135deg,var(--orange),#F59A4C);
+      color:white;
+      border-color:transparent;
+      box-shadow: 0 4px 15px rgba(244,162,56,0.3);
+    }
+
+    .filter-btn:hover:not(.active){
+      border-color:var(--navy);
+      color:var(--navy);
+      transform: translateY(-2px);
+    }
+
+    /* GALLERY GRID */
+    .gallery-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+      gap:24px;
+      margin-bottom:80px;
+    }
+
+    .gallery-item{
+      position:relative;
+      overflow:hidden;
+      border-radius:var(--radius);
+      aspect-ratio:1; 
+      cursor:pointer;
+      background:var(--card-bg);
+      box-shadow:0 4px 20px rgba(0,0,0,0.05);
+      transition:all .3s ease;
+    }
+
+    .gallery-item:hover{
+      transform:translateY(-8px);
+      box-shadow:0 12px 40px rgba(46,42,143,0.15);
+      z-index: 2;
+    }
+
+    .gallery-item img{
+      width:100%;
+      height:100%;
+      object-fit:cover; 
+      transition:transform 0.5s ease;
+    }
+
+    .gallery-item:hover img{
+      transform:scale(1.1);
+    }
+
+    .gallery-overlay{
+      position:absolute;
+      inset:0;
+      background:linear-gradient(to top, rgba(46,42,143,0.9), rgba(244,162,56,0.4));
+      opacity:0;
+      transition:opacity .3s ease;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      color:white;
+      text-align:center;
+      padding:24px;
+    }
+
+    .gallery-item:hover .gallery-overlay{
+      opacity:1;
+    }
+
+    .overlay-title{
+      font-size:20px;
+      font-weight:700;
+      margin-bottom:8px;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover .overlay-title {
+        transform: translateY(0);
+    }
+
+    .overlay-meta{
+      font-size:14px;
+      opacity:0.9;
+      transform: translateY(20px);
+      transition: transform 0.3s ease 0.1s;
+    }
+    
+    .gallery-item:hover .overlay-meta {
+        transform: translateY(0);
+    }
+
+    /* MODAL */
+    .modal{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(10,10,30,0.95);
+      backdrop-filter: blur(5px);
+      z-index:1000;
+      animation:fadeIn .3s ease;
+      overflow:hidden;
+    }
+
+    .modal.active{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    @keyframes fadeIn{
+      from{opacity:0}
+      to{opacity:1}
+    }
+
+    .modal-content{
+      position:relative;
+      max-width:1000px;
+      width: 90vw;
+      max-height:90vh;
+      display:flex;
+      flex-direction:column;
+      background:#fff;
+      border-radius:var(--radius);
+      overflow:hidden;
+      animation:slideUp .3s ease;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes slideUp{
+      from{transform:translateY(50px);opacity:0}
+      to{transform:translateY(0);opacity:1}
+    }
+
+    .modal-image{
+      width:100%;
+      height: 60vh;
+      object-fit:contain; /* Changed to contain so we see full event photos */
+      background:#000;
+    }
+
+    .modal-info{
+      padding:20px 30px;
+      background:#fff;
+      color:var(--text-dark);
+      border-top: 4px solid var(--orange);
+    }
+
+    .modal-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+
+    .modal-title{
+      font-size:24px;
+      font-weight:700;
+      color:var(--navy);
+      margin: 0;
+    }
+
+    .photo-counter {
+        font-size: 13px;
+        background: #eee;
+        padding: 4px 10px;
+        border-radius: 12px;
+        color: #555;
+        font-weight: 600;
+    }
+
+    .modal-date{
+      font-size:14px;
+      color:var(--orange);
+      font-weight: 600;
+      margin:0 0 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .modal-description{
+      font-size:15px;
+      color:var(--muted);
+      line-height:1.6;
+      margin:0;
+    }
+
+    .modal-close{
+      position:absolute;
+      top:20px;
+      right:20px;
+      width:40px;
+      height:40px;
+      background:rgba(255,255,255,0.9);
+      border:none;
+      border-radius:50%;
+      color:var(--navy);
+      font-size:28px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all .2s ease;
+      z-index:1001;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .modal-close:hover{
+      background:white;
+      transform: scale(1.1);
+    }
+
+    .modal-nav{
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      background:rgba(255,255,255,0.2);
+      border:1px solid rgba(255,255,255,0.3);
+      color:white;
+      font-size:24px;
+      width:50px;
+      height:50px;
+      border-radius: 50%;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all .2s ease;
+      z-index:1001;
+    }
+
+    .modal-nav:hover{
+      background:rgba(255,255,255,0.9);
+      color: var(--navy);
+    }
+
+    .modal-prev{left:30px}
+    .modal-next{right:30px}
+
+    /* STATISTICS */
+    .gallery-stats{
+      background:linear-gradient(135deg,var(--navy),var(--purple));
+      color:white;
+      padding:60px 40px;
+      border-radius:24px;
+      text-align:center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .gallery-stats::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80') center/cover;
+        opacity: 0.1;
+        mix-blend-mode: overlay;
+    }
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:40px;
+      margin-top:32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-item h3{
+      font-size:42px;
+      margin:0 0 8px;
+      color:var(--orange);
+      font-weight: 800;
+    }
+
+    .stat-item p{
+      font-size:16px;
+      margin:0;
+      opacity:0.9;
+      font-weight: 500;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeInUp{
+      from{opacity:0;transform:translateY(20px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    .gallery-item{animation:fadeInUp .6s ease forwards}
+    .gallery-item:nth-child(1){animation-delay:.1s}
+    .gallery-item:nth-child(2){animation-delay:.15s}
+    .gallery-item:nth-child(3){animation-delay:.2s}
+    .gallery-item:nth-child(4){animation-delay:.1s}
+    .gallery-item:nth-child(5){animation-delay:.15s}
+    .gallery-item:nth-child(6){animation-delay:.2s}
+
+    @media(max-width:768px){
+      .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+      .modal-content {width: 95vw;}
+      .modal-image {height: 40vh;}
+      .gallery-stats{padding:40px 20px}
+      .stat-item h3{font-size:32px}
+      .modal-nav { display: none; } /* Hide arrows on mobile, rely on close */
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="header-inner">
+        <div class="brand">
+          <img src="images/vvit.png" alt="VVIT Logo" />
+          <span>VVIT</span>
+        </div>
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="events.html">Events</a>
+          <a href="calendar.html">Calendar</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="teams.html">Teams</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="hero-gallery">
+        <h1>Event Gallery</h1>
+        <p>Explore the highlights from our past events, workshops, and community gatherings. Witness the innovation and collaboration that define IIC.</p>
+      </div>
+
+      <div class="filter-container">
+        <button class="filter-btn active" data-filter="all">All Events</button>
+        <button class="filter-btn" data-filter="hackathon">Hackathons</button>
+        <button class="filter-btn" data-filter="workshop">Workshops</button>
+        <button class="filter-btn" data-filter="bootcamp">Bootcamp</button>
+        <button class="filter-btn" data-filter="summit">Summit</button>
+      </div>
+
+      <div class="gallery-grid" id="galleryGrid">
+        
+        <div class="gallery-item" data-id="sih2025" data-category="hackathon" data-title="SIH Hackathon" data-date="Sept 24, 2025" data-description="The Institution's Innovation Council at VVIT University successfully organized Smart India Hackathon 2025. This national-level event provided a platform for students to demonstrate their technical prowess and entrepreneurial spirit.">
+          <img src="images/sih.png" alt="SIH Hackathon">
+          <div class="gallery-overlay">
+            <div class="overlay-title">SIH Hackathon</div>
+            <div class="overlay-meta">Sept 24, 2025</div>
+          </div>
+        </div>
+
+        <div class="gallery-item" data-id="coding2025" data-category="hackathon" data-title="Intense Coding" data-date="January 15, 2025" data-description="Held on October 15th, 'INNOVATE-IT' was a dedicated ideation platform designed to foster the entrepreneurial spirit. Student teams of 2-3 members
+         showcased their problem-solving skills, presenting unique concepts under the theme 'Ignite Ideas, Inspire Action.">
+          <img src="images/inoit.png.png" alt="Students Coding">
+          <div class="gallery-overlay">
+            <div class="overlay-title">Innovate it</div>
+            <div class="overlay-meta">oct 15, 2025</div>
+          </div>
+        </div>
+
+        <div class="gallery-item" data-id="pitch2025" data-category="workshop" data-title="Final Presentations" data-date="January 17, 2025" data-description="From student to founder!  our students received invaluable mentorship from the host MR.Dileep Sajja who broke down the importance of entrepreneurship and shared the essential 
+        strategies needed to build a business from scratch.">
+          <img src="images/techtalk.png" alt="Presentation">
+          <div class="gallery-overlay">
+            <div class="overlay-title">Tech Talks</div>
+            <div class="overlay-meta">Nov 17, 2025</div>
+          </div>
+        </div>
+
+        <div class="gallery-item" data-id="idea2025" data-category="bootcamp" data-title="Idea Generation" data-date="May, 2025" data-description="VVIT IIC organized a field visit to Vignan TBI, providing students with a practical understanding of the incubation process. The session focused on bridging the gap between 
+        academic learning and real-world startup strategies">
+          <img src="images/incu1.png" alt="Group Discussion">
+          <div class="gallery-overlay">
+            <div class="overlay-title">Incubation Visit</div>
+            <div class="overlay-meta">MAY, 2025</div>
+          </div>
+        </div>
+      </div>
+
+      <section class="gallery-stats">
+        <h2>IIC by the Numbers</h2>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <h3>50+</h3>
+            <p>Photos Captured</p>
+          </div>
+          <div class="stat-item">
+            <h3>12</h3>
+            <p>Events Hosted</p>
+          </div>
+          <div class="stat-item">
+            <h3>500+</h3>
+            <p>Participants</p>
+          </div>
+          <div class="stat-item">
+            <h3>100%</h3>
+            <p>Innovation Impact</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer style="background:#111; color:#fff; padding:60px 0 0 0; margin-top:0;">
+      <div style="max-width:1200px;margin:0 auto;padding:0 24px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:40px 24px;">
+          <div>
+            <h4 style="font-size:20px;font-weight:700;margin-bottom:16px;">VVIT IIC</h4>
+            <p style="color:#bbb;line-height:1.7;font-size:15px;">Institution's Innovation Council (IIC) promotes innovation and entrepreneurship within academic institutions.</p>
+          </div>
+          <div>
+            <h5 style="font-size:15px;font-weight:600;margin-bottom:12px;">Shop</h5>
+            <ul style="list-style:none;padding:0;margin:0;">
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Sell online</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Features</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Examples</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 style="font-size:15px;font-weight:600;margin-bottom:12px;">Press</h5>
+            <ul style="list-style:none;padding:0;margin:0;">
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Events</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">News</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Awards</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 style="font-size:15px;font-weight:600;margin-bottom:12px;">Contact</h5>
+            <ul style="list-style:none;padding:0;margin:0;">
+              <li><a href="#contact" style="color:#bbb;display:block;padding:4px 0;">Contact Us</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Team</a></li>
+            </ul>
+          </div>
+        </div>
+        <hr style="border:0;border-top:1px solid #222;margin:40px 0 24px 0">
+        <p style="color:#888;font-size:14px;margin:32px 0 0 0;">&copy; <span id="year"></span> Institution's Innovation Council. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <img class="modal-image" id="modalImage" src="" alt="">
+      <div class="modal-info">
+        <div class="modal-header-row">
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <span class="photo-counter" id="photoCounter">1 / 1</span>
+        </div>
+        <p class="modal-date" id="modalDate"></p>
+        <p class="modal-description" id="modalDescription"></p>
+      </div>
+      <button class="modal-nav modal-prev" onclick="prevPhoto()">&lt;</button>
+      <button class="modal-nav modal-next" onclick="nextPhoto()">&gt;</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // === 1. DEFINE YOUR EVENT ALBUMS HERE ===
+    // Keys match the 'data-id' in your HTML. Values are lists of image URLs.
+    const eventAlbums = {
+        "sih2025": [
+            "images/sih.png",
+            "images/sih2.png",
+            "images/sih3.png",
+            "images/sih4.png"
+        ],
+        "coding2025": [
+            "images/inoit.png.png",
+            "images/inoit2.png",
+            "images/inoit3.png"
+        ],
+        "pitch2025": [
+            "images/techtalk.png"
+        ],
+        "idea2025": [
+            "images/incu1.png",
+            "images/incu2.png",
+            "images/incu3.png"
+        ]
+    };
+
+    let currentEventId = null;
+    let currentPhotoIndex = 0;
+    
+    // Filter Logic
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.getAttribute('data-filter');
+        galleryItems.forEach(item => {
+          if(filter === 'all' || item.getAttribute('data-category') === filter) {
+            item.style.display = 'block';
+            item.style.animation = 'fadeInUp .6s ease forwards';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Modal Logic
+    galleryItems.forEach((item) => {
+      item.addEventListener('click', () => {
+        openModal(item);
+      });
+    });
+
+    function openModal(item) {
+      currentEventId = item.getAttribute('data-id');
+      currentPhotoIndex = 0; // Reset to first photo
+
+      // Update Text Info
+      document.getElementById('modalTitle').textContent = item.getAttribute('data-title');
+      document.getElementById('modalDate').textContent = item.getAttribute('data-date');
+      document.getElementById('modalDescription').textContent = item.getAttribute('data-description');
+      
+      // Update Image
+      updateModalImage();
+      
+      document.getElementById('modal').classList.add('active');
+    }
+
+    function updateModalImage() {
+        // If the event exists in our database, use those photos. Otherwise fall back to the main image tag.
+        const photos = eventAlbums[currentEventId];
+        
+        if (photos && photos.length > 0) {
+            document.getElementById('modalImage').src = photos[currentPhotoIndex];
+            document.getElementById('photoCounter').textContent = `${currentPhotoIndex + 1} / ${photos.length}`;
+            document.getElementById('photoCounter').style.display = 'block';
+            // Show arrows if more than 1 photo
+            const displayArrows = photos.length > 1 ? 'flex' : 'none';
+            document.querySelector('.modal-prev').style.display = displayArrows;
+            document.querySelector('.modal-next').style.display = displayArrows;
+        } else {
+            // Fallback if no album data is found (hides arrows)
+            document.getElementById('modalImage').src = ""; 
+            document.getElementById('photoCounter').style.display = 'none';
+            document.querySelector('.modal-prev').style.display = 'none';
+            document.querySelector('.modal-next').style.display = 'none';
+        }
+    }
+
+    function nextPhoto() {
+        const photos = eventAlbums[currentEventId];
+        if (!photos) return;
+        currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
+        updateModalImage();
+    }
+
+    function prevPhoto() {
+        const photos = eventAlbums[currentEventId];
+        if (!photos) return;
+        currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
+        updateModalImage();
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if(e.target === document.getElementById('modal')) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if(document.getElementById('modal').classList.contains('active')) {
+        if(e.key === 'ArrowRight') nextPhoto();
+        if(e.key === 'ArrowLeft') prevPhoto();
+        if(e.key === 'Escape') closeModal();
+      }
+    });
+  </script>
+</body>
+</html>

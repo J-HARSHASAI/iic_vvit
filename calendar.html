@@ -1,0 +1,981 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IIC — Calendar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* =========================================
+       1. GLOBAL VARIABLES & THEME
+       ========================================= */
+    :root{
+      --navy:#2E2A8F;
+      --orange:#F4A238;
+      --red:#D92E2E;
+      --purple:#6B5BA8;
+      --bg:#FAF9F7;
+      --card-bg:#FFFFFF;
+      --muted:#6b6b6b;
+      --border:#E8E7E3;
+      --gap:24px;
+      --container:1200px;
+      --radius:16px;
+      --success: #28a745;
+      --completed: #6c757d;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;scroll-behavior:smooth}
+    a{color:inherit;text-decoration:none}
+
+    /* ==== BACKGROUND LOGO WATERMARK ==== */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.02) 100%),
+        url("images/IIC.png") center/500px auto no-repeat;
+      opacity:0.15;
+      z-index:-1;
+      transform:translateZ(0);
+      pointer-events: none;
+    }
+
+    .wrap{
+      width:100vw;
+      margin:0;
+      padding:0;
+      background: transparent !important;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* =========================================
+       2. HEADER
+       ========================================= */
+    header{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px 40px 20px 40px;
+      margin-bottom:0;
+      position:relative;
+      background:transparent !important;
+      z-index:100;
+      box-shadow:none;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+      gap: 48px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:700;
+      font-size:18px;
+      color:var(--navy)
+    }
+    .brand img{
+      height:40px;
+      width:auto;
+      display:block;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.02));
+    }
+    nav{
+      display:flex;
+      gap:32px;
+      align-items:center
+    }
+    nav a{
+      font-size:14px;
+      color:var(--muted);
+      transition:color .2s ease;
+      font-weight:500
+    }
+    nav a:hover{color:var(--navy)}
+    @media(max-width:768px){
+      nav{display:none}
+      header{padding:16px 0;margin-bottom:8px}
+      .brand{font-size:16px}
+      .header-inner{justify-content: flex-start; padding: 0 20px;}
+    }
+
+    /* =========================================
+       3. CALENDAR PAGE STYLES
+       ========================================= */
+    
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .hero-calendar{
+      text-align:center;
+      margin-bottom:60px;
+      padding:40px 20px;
+    }
+
+    .hero-calendar h1{
+      font-size:48px;
+      font-weight:700;
+      margin:0 0 16px;
+      background:linear-gradient(135deg, var(--navy), var(--purple));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    .hero-calendar p{
+      font-size:18px;
+      color:var(--muted);
+      max-width:700px;
+      margin:0 auto;
+      line-height:1.6;
+    }
+
+    /* Glass Card Style */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 24px 0 rgba(46,42,143,0.08);
+      border: 1px solid rgba(255,255,255,0.6);
+      padding: 30px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .calendar-wrapper{
+      display:grid;
+      grid-template-columns:1fr 400px;
+      gap:32px;
+      margin-bottom:60px;
+    }
+    
+    .calendar { overflow: hidden; }
+
+    .calendar-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:30px;
+    }
+
+    .calendar-nav{
+      background: linear-gradient(135deg,var(--orange),#F59A4C);
+      border: none;
+      font-size: 18px;
+      color: white;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .3s ease;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(244,162,56,0.3);
+    }
+    .calendar-nav:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(244,162,56,0.4);
+    }
+
+    .calendar-title{
+      font-size:24px;
+      font-weight:700;
+      color:var(--navy);
+      text-align:center;
+      flex:1;
+    }
+
+    .weekdays{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .weekday{
+      text-align:center;
+      font-weight:600;
+      color:var(--muted);
+      font-size:13px;
+      padding:12px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .days{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:12px;
+    }
+    .day{
+      aspect-ratio:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:12px;
+      cursor:pointer;
+      transition:all .2s ease;
+      font-weight:500;
+      font-size:14px;
+      position:relative;
+      background: rgba(255,255,255,0.5);
+      color: var(--navy);
+      border: 1px solid transparent;
+    }
+    .day:hover:not(.empty):not(.other-month){
+      background: white;
+      border-color: var(--orange);
+      transform:translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .day.event-day{
+      background:linear-gradient(135deg, rgba(46,42,143,0.1), rgba(107,91,168,0.1));
+      color: var(--navy);
+      font-weight:700;
+    }
+    .day.event-day::after{
+      content:'';
+      position:absolute;
+      bottom:6px;
+      left:50%;
+      transform:translateX(-50%);
+      width:6px;
+      height:6px;
+      background: var(--orange);
+      border-radius:50%;
+    }
+
+    .day.event-day.selected{
+      background: var(--navy);
+      color: white;
+      box-shadow: 0 4px 12px rgba(46,42,143,0.3);
+    }
+    .day.event-day.selected::after{
+      background: white;
+    }
+    .day.other-month{
+      color: #ccc;
+      cursor:default;
+      background: transparent;
+    }
+
+    /* Sidebar Styling */
+    .event-details-sidebar{
+      height:fit-content;
+      position:sticky;
+      top:100px;
+    }
+
+    .sidebar-header{
+      font-size:14px;
+      color:var(--orange);
+      font-weight:700;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:1px;
+    }
+
+    .event-title{
+      font-size:26px;
+      font-weight:700;
+      color:var(--navy);
+      margin:0 0 16px;
+      line-height:1.2;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .status-badge.upcoming {
+      background: rgba(40, 167, 69, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(40, 167, 69, 0.2);
+    }
+    .status-badge.completed {
+      background: rgba(108, 117, 125, 0.1);
+      color: var(--completed);
+      border: 1px solid rgba(108, 117, 125, 0.2);
+    }
+
+    .event-type-badge{
+      display:inline-block;
+      background:linear-gradient(135deg,rgba(244,162,56,0.15),rgba(107,91,168,0.15));
+      color:var(--navy);
+      padding:6px 14px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:600;
+      margin-bottom:24px;
+      margin-left: 8px;
+    }
+
+    .event-description{
+      color:var(--muted);
+      line-height:1.7;
+      margin-bottom:24px;
+      font-size:14px;
+    }
+
+    .event-info-grid{
+      background: rgba(240, 240, 245, 0.5);
+      padding:20px;
+      border-radius:12px;
+      border-left:4px solid var(--orange);
+    }
+    .info-row{
+      display:flex;
+      align-items:flex-start;
+      margin-bottom:16px;
+      gap:12px;
+    }
+    .info-row:last-child{margin-bottom:0}
+    .info-icon{font-size:18px;color:var(--orange);min-width:24px;}
+    .info-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:2px;}
+    .info-value{font-size:14px;color:var(--navy);font-weight:600;}
+
+    .view-details-btn{
+      width:100%;
+      padding:14px 24px;
+      background:linear-gradient(135deg, var(--navy), var(--purple));
+      color:white;
+      border:none;
+      border-radius:999px;
+      font-size:15px;
+      font-weight:600;
+      cursor:pointer;
+      transition:all .3s ease;
+      margin-top:24px;
+      box-shadow:0 8px 24px rgba(46,42,143,0.2);
+    }
+    .view-details-btn:hover{
+      transform:translateY(-4px);
+      box-shadow:0 12px 36px rgba(46,42,143,0.3);
+    }
+
+    .no-event-selected{
+      text-align:center;
+      padding:60px 20px;
+      color:var(--muted);
+    }
+    .no-event-selected svg{
+      width:64px;
+      height:64px;
+      margin-bottom:16px;
+      opacity:0.2;
+      color: var(--navy);
+    }
+
+    /* Modal Styling */
+    .modal-overlay{
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
+      background:rgba(46,42,143,0.3);
+      backdrop-filter:blur(8px);
+      z-index:1000;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      animation:fadeIn 0.3s ease;
+    }
+    .modal-overlay.active{display:flex;}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+    .modal-content{
+      background: white;
+      border-radius:24px;
+      max-width:900px;
+      width:100%;
+      max-height:90vh;
+      overflow-y:auto;
+      position:relative;
+      animation:slideUp 0.3s ease;
+      box-shadow:0 24px 80px rgba(0,0,0,0.2);
+    }
+    @keyframes slideUp{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+    .modal-header{padding:40px 40px 0; position:relative;}
+    .modal-close{
+      position:absolute;
+      top:24px;
+      right:24px;
+      background:#f0f0f0;
+      border:none;
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      cursor:pointer;
+      font-size:24px;
+      color:var(--muted);
+      transition:.3s;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:10;
+    }
+    .modal-close:hover{background:var(--red);color:white;}
+
+    .modal-event-badge{
+      display:inline-block;
+      background:linear-gradient(135deg,var(--orange),#F59A4C);
+      color:white;
+      padding:8px 20px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:600;
+      margin-bottom:16px;
+    }
+    .modal-event-title{font-size:32px;font-weight:700;color:var(--navy);margin:0 0 12px;line-height:1.2;}
+    .modal-event-date{font-size:16px;color:var(--muted);margin-bottom:32px;display:flex;align-items:center;gap:8px;font-weight: 500;}
+
+    .modal-body{padding:0 40px 40px;}
+    .modal-section{margin-bottom:32px;}
+    .modal-section-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+
+    .quick-info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px;}
+    .quick-info-card{background: #fafafa;padding:20px;border-radius:12px;border-left:4px solid var(--orange);}
+    .quick-info-label{font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;}
+    .quick-info-value{font-size:15px; color:var(--navy); font-weight:600;}
+
+    .contact-card{
+      background:linear-gradient(135deg,rgba(46,42,143,0.05),rgba(244,162,56,0.05));
+      padding:24px;
+      border-radius:12px;
+      border:1px solid rgba(46,42,143,0.1);
+    }
+    .contact-person{display:flex; align-items:center; gap:16px; margin-bottom:16px;}
+    .contact-avatar{
+      width:50px; height:50px; border-radius:50%;
+      background:linear-gradient(135deg,var(--navy),var(--purple));
+      display:flex; align-items:center; justify-content:center;
+      color:white; font-size:20px; font-weight:700;
+    }
+    .contact-name{font-size:16px; font-weight:700; color:var(--navy);}
+    .contact-role{font-size:13px; color:var(--orange); font-weight:600;}
+
+    @media(max-width:1024px){
+      .calendar-wrapper{grid-template-columns:1fr;gap:24px}
+      .event-details-sidebar{position:static;top:auto}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="header-inner">
+        <div class="brand">
+          <img src="images/vvit.png" alt="VVIT Logo" />
+          <span>VVIT</span>
+        </div>
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="events.html">Events</a>
+          <a href="calendar.html">Calendar</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="teams.html">Teams</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="hero-calendar">
+        <h1>Event Calendar</h1>
+        <p>Track all IIC events, workshops, bootcamps, and community gatherings. Plan your participation in upcoming innovation initiatives.</p>
+      </div>
+
+      <div class="calendar-wrapper">
+        <div class="calendar glass-card">
+          <div class="calendar-header">
+            <button class="calendar-nav" onclick="previousMonth()">&lt;</button>
+            <div class="calendar-title" id="monthYear"></div>
+            <button class="calendar-nav" onclick="nextMonth()">&gt;</button>
+          </div>
+
+          <div class="weekdays">
+            <div class="weekday">Sun</div>
+            <div class="weekday">Mon</div>
+            <div class="weekday">Tue</div>
+            <div class="weekday">Wed</div>
+            <div class="weekday">Thu</div>
+            <div class="weekday">Fri</div>
+            <div class="weekday">Sat</div>
+          </div>
+
+          <div class="days" id="calendarDays"></div>
+        </div>
+
+        <div class="event-details-sidebar glass-card" id="eventDetailsSidebar">
+          <div class="no-event-selected">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <p>Click on a highlighted date to view event details</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer style="background:#111; color:#fff; padding:60px 0 0 0; margin-top:0;">
+      <div style="max-width:1200px;margin:0 auto;padding:0 24px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:40px 24px;">
+          <div>
+            <h4 style="font-size:20px;font-weight:700;margin-bottom:16px;">VVIT IIC</h4>
+            <p style="color:#bbb;line-height:1.7;font-size:15px;">Institution's Innovation Council (IIC) promotes innovation and entrepreneurship within academic institutions.</p>
+          </div>
+          <div>
+            <h5 style="font-size:15px;font-weight:600;margin-bottom:12px;">Quick Links</h5>
+            <ul style="list-style:none;padding:0;margin:0;">
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Home</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Events</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">About Us</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 style="font-size:15px;font-weight:600;margin-bottom:12px;">Resources</h5>
+            <ul style="list-style:none;padding:0;margin:0;">
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">YUKTI</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">MIC</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">AICTE</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 style="font-size:15px;font-weight:600;margin-bottom:12px;">Contact</h5>
+            <ul style="list-style:none;padding:0;margin:0;">
+              <li><a href="#contact" style="color:#bbb;display:block;padding:4px 0;">Contact Us</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Team</a></li>
+            </ul>
+          </div>
+        </div>
+        <hr style="border:0;border-top:1px solid #222;margin:40px 0 24px 0">
+        <p style="color:#888;font-size:14px;margin:32px 0 0 0;">&copy; <span id="year"></span> Institution's Innovation Council. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+
+  <script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Initialize Calendar to December 2025 to show new events
+  let currentDate = new Date(2025, 11, 1); 
+  let selectedDate = null;
+
+  // New Contact Person Info
+  const newEventContact = {
+    name: 'Harsha Vardhan',
+    role: 'Events Team',
+    phone: '9177818027',
+    email: 'jvharsha.s@gmail.com',
+    initial: 'HV'
+  };
+
+  // Helper to check status
+  function getEventStatus(dateStr) {
+    const eventDate = new Date(dateStr);
+    const today = new Date();
+    // Normalize to compare dates only
+    eventDate.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+    return eventDate < today ? 'Completed' : 'Upcoming';
+  }
+
+  const events = {
+    // --- Past Events (2023) ---
+    '2025-01-15': {
+      title: 'New Year Innovation Meet',
+      type: 'Meeting',
+      time: '10:00 AM',
+      location: 'Conference Room',
+      description: 'Kickstart the year with innovative ideas.',
+      fullDescription: 'Annual innovation meet to discuss breakthrough ideas and opportunities.',
+      contact: {         name: 'Harsha Vardhan',
+        role: 'iic team vvitu',
+        phone: '9177818027',
+        email: 'jvharsha.s@gmail.com',
+        initial: 'HV'}
+    },
+    '2025-02-20': {
+      title: 'Design Thinking Workshop',
+      type: 'Workshop',
+      time: '02:00 PM',
+      location: 'Innovation Lab',
+      description: 'Learn design thinking methodologies to solve complex problems.',
+      fullDescription: 'Immerse yourself in the world of design thinking through this hands-on workshop. Learn the five-stage process of empathize, define, ideate, prototype, and test.',
+      contact: {         name: 'Harsha Vardhan',
+        role: 'iic team vvitu',
+        phone: '9177818027',
+        email: 'jvharsha.s@gmail.com',
+        initial: 'HV' }
+    },
+    '2025-03-10': {
+      title: 'Patent Filing Seminar',
+      type: 'Seminar',
+      time: '11:00 AM',
+      location: 'Auditorium',
+      description: 'Understand the process of filing patents and protecting innovative ideas.',
+      fullDescription: 'A comprehensive seminar on intellectual property rights and patent filing procedures. Learn how to protect your innovations and navigate the legal landscape.',
+      contact: { name: 'Harsha Vardhan', role: 'Events Team', phone: '9177889900', email: 'jvharsha.s@gmail.com', initial: 'H' }
+    },
+    '2025-04-25': {
+      title: 'Startup Pitch Competition',
+      type: 'Competition',
+      time: '09:00 AM',
+      location: 'Main Hall',
+      description: 'Present startup ideas to investors and industry experts.',
+      fullDescription: 'The ultimate platform for aspiring entrepreneurs. Present your business plan to a panel of investors. Top performers receive seed funding and incubation support.',
+      contact: { name: 'Kiran Kumar', role: 'Startup Manager', phone: '9123456789', email: 'kiran@iic.edu', initial: 'KK' }
+    },
+    '2025-05-18': {
+      title: 'Tech Innovation Summit',
+      type: 'Summit',
+      time: '10:30 AM',
+      location: 'Convention Center',
+      description: 'Annual summit featuring keynote speakers and panel discussions.',
+      fullDescription: 'Join industry leaders and technology enthusiasts for a full-day summit exploring cutting-edge technologies and the future of innovation.',
+      contact: { name: 'Harsha', role: 'Summit Coordinator', phone: '9177889900', email: 'harsha@iic.edu', initial: 'H' }
+    },
+    '2025-06-12': {
+      title: 'AI & ML Bootcamp',
+      type: 'Bootcamp',
+      time: '09:00 AM',
+      location: 'Computer Lab',
+      description: 'Intensive bootcamp covering AI and ML fundamentals.',
+      fullDescription: 'A comprehensive 3-day bootcamp designed to take you from basics to building real-world AI models. Learn Python, data preprocessing, and deep learning.',
+      contact: { name: 'Deepa Singh', role: 'Tech Lead', phone: '9988776655', email: 'deepa@iic.edu', initial: 'DS' }
+    },
+    '2025-07-08': {
+      title: 'Industry Connect Program',
+      type: 'Program',
+      time: '03:00 PM',
+      location: 'Seminar Hall',
+      description: 'Connect with industry professionals and explore opportunities.',
+      fullDescription: 'Meet hiring managers and HR representatives from leading companies. Learn about career paths, internship opportunities, and industry expectations.',
+      contact: { name: 'Harsha', role: 'Industry Relations', phone: '9177889900', email: 'harsha@iic.edu', initial: 'H' }
+    },
+    '2025-08-22': {
+      title: 'Research Paper Presentation',
+      type: 'Presentation',
+      time: '01:00 PM',
+      location: 'Research Center',
+      description: 'Students present research findings to the academic community.',
+      fullDescription: 'Showcase your research work to faculty and peers. Present findings, methodologies, and conclusions in a professional academic setting.',
+      contact: { name: 'Dr. Lakshmi Reddy', role: 'Research Coordinator', phone: '9876512345', email: 'lakshmi@iic.edu', initial: 'LR' }
+    },
+    '2025-09-23': {
+      title: 'Smart India Hackathon (SIH)',
+      type: 'Hackathon',
+      time: '09:00 AM',
+      location: 'New Block Seminar Hall',
+      description: 'National-level hackathon solving real-world problems.',
+      fullDescription: 'Join India\'s biggest hackathon! Work in teams to solve problem statements from government ministries. 36-hour coding marathon with mentorship.',
+      contact: { name: 'Harsha', role: 'SIH Coordinator', phone: '9177889900', email: 'harsha@iic.edu', initial: 'H' }
+    },
+    '2025-10-15': {
+      title: 'Innovation Day Celebration',
+      type: 'Celebration',
+      time: '10:00 AM',
+      location: 'IIC Hall',
+      description: 'Celebration with inspiring talks and awards.',
+      fullDescription: 'Experience inspiring keynote speeches and celebrate the achievements of our innovation community. Awards for Best Innovator and Best Project.',
+      contact: { name: 'Neha Patel', role: 'Events Head', phone: '9865432100', email: 'neha@iic.edu', initial: 'NP' }
+    },
+    '2025-11-15': {
+      title: 'Workshop on Entrepreneurship',
+      type: 'Workshop',
+      time: '11:00 AM',
+      location: 'Seminar Hall',
+      description: 'Workshop on startup ideas and business models.',
+      fullDescription: 'Transform your idea into a successful business! This workshop covers idea validation, business model canvas, and funding strategies.',
+      contact: { name: 'Harsha', role: 'E-Cell Coordinator', phone: '9177889900', email: 'harsha@iic.edu', initial: 'H' }
+    },
+    '2025-12-19': {
+      title: 'Incubation Center Visit',
+      type: 'Visit',
+      time: '10:30 AM',
+      location: 'SRM-AP Incubation Center',
+      description: 'Educational visit to explore incubation facilities.',
+      fullDescription: 'Get an exclusive behind-the-scenes look at a working incubation center! Tour state-of-the-art facilities, meet startup founders, and learn about resources available for early-stage startups.',
+      contact: { name: 'Harsha Vardhan', role: 'iic team vvitu', phone: '9177818027', email: 'jvharsha.s@gmail.com', initial: 'HV' }
+    },
+
+    // --- NEW Q2 EVENTS (Dec 2025 - Feb 2026) ---
+    '2025-12-05': {
+      title: 'Design Thinking & Innovation Design Workshop',
+      type: 'Workshop',
+      time: '09:30 AM',
+      location: 'Innovation Hall',
+      description: 'Validation of ideas using Design Thinking and Critical Thinking frameworks.',
+      fullDescription: 'A comprehensive workshop focused on Design Thinking, Critical Thinking, and Innovation Design. The goal is to validate at least 10 ideas and advance 5 to TRL 1-4. Teams will be shortlisted and data uploaded to the YUKTI Innovation Repository.',
+      contact: newEventContact
+    },
+    '2025-12-15': {
+      title: 'Innovation & Entrepreneurship Outreach Program',
+      type: 'Outreach',
+      time: '10:00 AM',
+      location: 'Local Schools / Community Center',
+      description: 'Outreach program in schools to foster innovation among students.',
+      fullDescription: 'An offline outreach program aiming to reach over 100 external students across at least 2 programs. The focus is on spreading awareness about Innovation and Entrepreneurship at the school level.',
+      contact: newEventContact
+    },
+    '2025-12-28': {
+      title: 'AI & Innovation Sprints',
+      type: 'Sprint',
+      time: '09:00 AM',
+      location: 'Computer Lab 3',
+      description: 'Rapid Prototyping for Digital Transformation.',
+      fullDescription: 'An intense session of AI/Innovation Sprints focusing on Rapid Prototyping for Digital Transformation. Targets include developing at least 5 digital prototypes and organizing 3 sprint events. Outcomes to be deposited in YUKTI.',
+      contact: newEventContact
+    },
+    '2026-01-10': {
+      title: 'Expert Talk on TRL, MRL & IP Commercialization',
+      type: 'Seminar',
+      time: '11:00 AM',
+      location: 'Main Auditorium',
+      description: 'Expert session on Technology Readiness Levels and Tech Transfer.',
+      fullDescription: 'A crucial expert talk covering Technology Readiness Level (TRL), Manufacturing Readiness Level (MRL), Investment Readiness Level (IRL), and IP Commercialization. Aiming for 80% positive feedback and generating tangible tech transfer plans.',
+      contact: newEventContact
+    },
+    '2026-01-22': {
+      title: 'Sales and Marketing Strategies for Start-ups',
+      type: 'Workshop',
+      time: '02:00 PM',
+      location: 'Seminar Hall B',
+      description: 'Workshop on effective market strategies and Business Model Canvas.',
+      fullDescription: 'A focused workshop for start-ups on Effective Sales and Marketing Strategies. Teams will work on completing their Business Model Canvas (BMC) and developing robust marketing strategies.',
+      contact: newEventContact
+    },
+    '2026-02-05': {
+      title: 'Field Visit to Preincubation Units',
+      type: 'Field Visit',
+      time: '08:30 AM',
+      location: 'AICTE Idea Lab / Fab Lab',
+      description: 'Exposure visit to MSME clusters or Preincubation units.',
+      fullDescription: 'Field/Exposure visit to pre-incubation units such as AICTE Idea Labs, Fab Labs, or MSME clusters. The objective is to establish linkages and form at least one meaningful partnership.',
+      contact: newEventContact
+    },
+    '2026-02-18': {
+      title: 'Institution Innovation Hackathon',
+      type: 'Competition',
+      time: '09:00 AM',
+      location: 'Central Block',
+      description: 'Inter/Intra-Institution Innovation Competition and Reward ceremony.',
+      fullDescription: 'Organizing an Inter/Intra-Institution Innovation Competition or Hackathon. We aim for 25+ entries with the best innovations being rewarded and uploaded to the YUKTI Innovation Repository.',
+      contact: newEventContact
+    },
+    '2026-02-25': {
+      title: 'Innovation Showcase: Demo Day',
+      type: 'Exhibition',
+      time: '10:00 AM',
+      location: 'Open Air Theatre',
+      description: 'Exhibition and Poster Presentation of Innovations and Prototypes.',
+      fullDescription: 'A grand Demo Day/Exhibition to showcase projects and poster presentations of innovations. At least 10 prototypes will be showcased, with mentorship linkages provided to 6+ teams.',
+      contact: newEventContact
+    }
+  };
+
+  function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    document.getElementById('monthYear').textContent = `${monthNames[month]} ${year}`;
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const prevLastDay = new Date(year, month, 0);
+    
+    const firstDayOfWeek = firstDay.getDay();
+    const lastDateOfMonth = lastDay.getDate();
+    const prevDateOfMonth = prevLastDay.getDate();
+
+    let calendarHTML = '';
+
+    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+      calendarHTML += `<div class="day other-month">${prevDateOfMonth - i}</div>`;
+    }
+
+    for (let i = 1; i <= lastDateOfMonth; i++) {
+      // Use local date string construction to avoid timezone issues
+      const currentMonth = month + 1;
+      const fmtMonth = currentMonth < 10 ? `0${currentMonth}` : currentMonth;
+      const fmtDay = i < 10 ? `0${i}` : i;
+      const dateStr = `${year}-${fmtMonth}-${fmtDay}`;
+      
+      const hasEvent = events[dateStr];
+
+      let classes = 'day';
+      if (hasEvent) {
+        classes += ' event-day';
+        if (selectedDate === dateStr) classes += ' selected';
+      }
+
+      const onclickAttr = hasEvent ? `onclick="selectDate('${dateStr}')"` : '';
+      calendarHTML += `<div class="${classes}" data-date="${dateStr}" ${onclickAttr}>${i}</div>`;
+    }
+
+    const totalCells = firstDayOfWeek + lastDateOfMonth;
+    const remainingDays = (totalCells <= 35) ? (35 - totalCells) : (42 - totalCells);
+    for (let i = 1; i <= remainingDays; i++) {
+      calendarHTML += `<div class="day other-month">${i}</div>`;
+    }
+
+    document.getElementById('calendarDays').innerHTML = calendarHTML;
+  }
+
+  function selectDate(dateStr) {
+    const event = events[dateStr];
+    if (!event) return;
+
+    selectedDate = dateStr;
+    document.querySelectorAll('.day.selected').forEach(el => el.classList.remove('selected'));
+    const selectedEl = document.querySelector(`[data-date="${dateStr}"]`);
+    if (selectedEl) selectedEl.classList.add('selected');
+
+    const date = new Date(dateStr);
+    const formattedDate = date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    
+    const status = getEventStatus(dateStr);
+    const statusClass = status.toLowerCase();
+
+    const sidebar = document.getElementById('eventDetailsSidebar');
+    sidebar.innerHTML = `
+      <div class="sidebar-header">${formattedDate}</div>
+      <div class="status-badge ${statusClass}">${status}</div>
+      <h2 class="event-title">${event.title}</h2>
+      <div class="event-type-badge">${event.type}</div>
+      <p class="event-description">${event.description}</p>
+      <div class="event-info-grid">
+        <div class="info-row">
+          <div class="info-icon">🕐</div>
+          <div class="info-content">
+            <div class="info-label">Time</div>
+            <div class="info-value">${event.time}</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">📍</div>
+          <div class="info-content">
+            <div class="info-label">Location</div>
+            <div class="info-value">${event.location}</div>
+          </div>
+        </div>
+      </div>
+      <button class="view-details-btn" onclick="openModal('${dateStr}')">View Full Details</button>
+    `;
+  }
+
+  function openModal(dateStr) {
+    const event = events[dateStr];
+    if (!event) return;
+
+    const date = new Date(dateStr);
+    const formattedDate = date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const status = getEventStatus(dateStr);
+    const statusClass = status.toLowerCase();
+
+    const modalContent = document.getElementById('modalContent');
+    modalContent.innerHTML = `
+      <button class="modal-close" onclick="closeModal()">×</button>
+      
+      <div class="modal-header">
+        <div class="modal-event-badge">${event.type}</div>
+        <h2 class="modal-event-title">${event.title}</h2>
+        <div class="modal-event-date">📅 ${formattedDate} <span class="status-badge ${statusClass}" style="margin-left:12px">${status}</span></div>
+      </div>
+
+      <div class="modal-body">
+        <div class="quick-info-grid">
+          <div class="quick-info-card">
+            <div class="quick-info-label">Time</div>
+            <div class="quick-info-value">🕐 ${event.time}</div>
+          </div>
+          <div class="quick-info-card">
+            <div class="quick-info-label">Location</div>
+            <div class="quick-info-value">📍 ${event.location}</div>
+          </div>
+          <div class="quick-info-card">
+            <div class="quick-info-label">Type</div>
+            <div class="quick-info-value">📋 ${event.type}</div>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <h3 class="modal-section-title"><span class="modal-section-icon">📝</span> About This Event</h3>
+          <p class="modal-description" style="color:var(--muted);line-height:1.7;">${event.fullDescription}</p>
+        </div>
+
+        ${event.contact ? `
+        <div class="modal-section">
+          <h3 class="modal-section-title"><span class="modal-section-icon">📞</span> Contact Person</h3>
+          <div class="contact-card">
+            <div class="contact-person">
+              <div class="contact-avatar">${event.contact.initial}</div>
+              <div class="contact-details">
+                <div class="contact-name">${event.contact.name}</div>
+                <div class="contact-role">${event.contact.role}</div>
+              </div>
+            </div>
+            <div class="contact-info" style="display:flex;flex-direction:column;gap:8px;">
+              <div class="contact-info-item" style="display:flex;gap:10px;font-size:14px;color:var(--navy);">
+                <span class="contact-icon">📱</span><span>${event.contact.phone}</span>
+              </div>
+              <div class="contact-info-item" style="display:flex;gap:10px;font-size:14px;color:var(--navy);">
+                <span class="contact-icon">✉</span><span>${event.contact.email}</span>
+              </div>
+            </div>
+          </div>
+        </div>` : ''}
+      </div>
+    `;
+    document.getElementById('modalOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  function closeModalOnOverlay(event) { if (event.target.id === 'modalOverlay') closeModal(); }
+  document.addEventListener('keydown', function(event) { if (event.key === 'Escape') closeModal(); });
+
+  function previousMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
+  function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
+
+  renderCalendar();
+  </script>
+</body>
+</html> 

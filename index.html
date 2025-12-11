@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IIC — Innovation Council</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* =========================================
+       1. GLOBAL VARIABLES & THEME
+       ========================================= */
+    :root{
+      --navy:#2E2A8F;
+      --orange:#F4A238;
+      --red:#D92E2E;
+      --purple:#6B5BA8;
+      --bg:#FAF9F7;
+      --card-bg:#FFFFFF;
+      --muted:#6b6b6b;
+      --border:#E8E7E3;
+      --gap:24px;
+      --container:1200px;
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;scroll-behavior:smooth}
+    a{color:inherit;text-decoration:none}
+
+    /* ==== BACKGROUND LOGO WATERMARK ==== */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.02) 100%),
+        url("images/IIC.png") center/500px auto no-repeat;
+      opacity:0.15;
+      z-index:-1;
+      transform:translateZ(0);
+      pointer-events: none;
+    }
+
+    .wrap{
+      width:100vw;
+      margin:0;
+      padding:0;
+      background: transparent !important;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* =========================================
+       2. HEADER
+       ========================================= */
+    header{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px 40px 20px 40px;
+      margin-bottom:0;
+      position:relative;
+      background:transparent !important;
+      z-index:100;
+      box-shadow:none;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+      gap: 48px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:700;
+      font-size:18px;
+      color:var(--navy)
+    }
+    .brand img{
+      height:40px;
+      width:auto;
+      display:block;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.02));
+    }
+    nav{
+      display:flex;
+      gap:32px;
+      align-items:center
+    }
+    nav a{
+      font-size:14px;
+      color:var(--muted);
+      transition:color .2s ease;
+      font-weight:500
+    }
+    nav a:hover{color:var(--navy)}
+    @media(max-width:768px){
+      nav{display:none}
+      header{padding:16px 0;margin-bottom:8px}
+      .brand{font-size:16px}
+      .header-inner{justify-content: flex-start; padding: 0 20px;}
+    }
+
+    /* =========================================
+       3. HERO SECTION
+       ========================================= */
+    .hero{
+      text-align: center;
+      padding: 80px 20px 60px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero h1{
+      font-size:56px;
+      font-weight:800;
+      line-height:1.2;
+      margin:0 0 24px;
+      background:linear-gradient(135deg, var(--navy), var(--purple));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    
+    .hero .subtitle{
+      font-size:18px;
+      color:var(--muted);
+      line-height:1.8;
+      margin:0 auto 40px;
+      max-width:700px;
+    }
+
+    .cta-group{
+      display:flex;
+      gap:16px;
+      align-items:center;
+      justify-content: center;
+    }
+
+    .cta{
+      display:inline-block;
+      background:linear-gradient(135deg,var(--orange),#F59A4C);
+      color:white;
+      padding:14px 36px;
+      border-radius:999px;
+      font-weight:600;
+      border:none;
+      cursor:pointer;
+      box-shadow:0 8px 24px rgba(244,162,56,0.3);
+      transition:all .3s ease;
+      font-size:15px
+    }
+    .cta:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(244,162,56,0.4)}
+    
+    .cta-secondary{
+      background:white;
+      color:var(--navy);
+      border:2px solid var(--navy);
+      box-shadow:0 4px 16px rgba(46,42,143,0.1)
+    }
+    .cta-secondary:hover{background:var(--navy);color:white;box-shadow:0 8px 28px rgba(46,42,143,0.2)}
+
+    @media(max-width:768px){
+        .hero{padding: 40px 20px;}
+        .hero h1{font-size:36px}
+        .cta-group{flex-direction:column;width:100%}
+        .cta{width: 100%;}
+    }
+
+    /* =========================================
+       4. KEY ACTIVITIES STRIP
+       ========================================= */
+    .activities-strip {
+        padding: 60px 20px;
+        background: transparent;
+        text-align: center;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .activities-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--navy);
+        margin-bottom: 50px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .activities-row {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 30px;
+    }
+
+    .activity-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 160px;
+        transition: transform 0.3s ease;
+    }
+
+    .activity-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .act-icon {
+        width: 60px;
+        height: 70px; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: var(--navy);
+        margin-bottom: 20px;
+        position: relative;
+    }
+    
+    .act-icon i {
+        filter: drop-shadow(0 4px 6px rgba(46,42,143,0.2));
+    }
+
+    .act-label {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--navy);
+        line-height: 1.4;
+    }
+
+    @media(max-width: 768px) {
+        .activities-row { gap: 40px; }
+        .activity-item { width: 45%; }
+    }
+
+    /* DIVIDER */
+    .divider{background: none !important;border: none !important;height: 20px;margin: 0;}
+
+    /* ABOUT SECTION */
+    .about{
+      background:linear-gradient(135deg,rgba(107,91,168,0.08),rgba(244,162,56,0.04));
+      padding:80px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 60px;
+      text-align: left;
+    }
+    .about-img {
+      flex: 0 0 450px;
+      max-width: 450px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .about-img img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 24px rgba(46,42,143,0.15));
+    }
+    .about-content {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .about-label {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--orange);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 12px;
+    }
+    .about-content h2 {
+      font-size:36px;
+      font-weight:800;
+      margin:0 0 20px;
+      color:var(--navy);
+      line-height: 1.2;
+    }
+    .about-content p {
+      color:var(--muted);
+      line-height:1.8;
+      font-size:16px;
+      margin:0 0 24px;
+    }
+    @media(max-width:900px){
+      .about{flex-direction:column;gap:40px;padding:60px 20px;}
+      .about-img{max-width:100%;width:100%;}
+      .about-content{width:100%;}
+    }
+
+    /* IMPACT STATS (New Section) */
+    .impact-section {
+        padding: 60px 20px;
+        background: transparent;
+        text-align: center;
+    }
+    .impact-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 1200px;
+        margin: 0 auto;
+        gap: 20px;
+    }
+    .impact-item h3 {
+        font-size: 42px;
+        font-weight: 800;
+        color: var(--orange);
+        margin: 0;
+    }
+    .impact-item p {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--navy);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 8px;
+    }
+    @media(max-width: 768px) {
+        .impact-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+    }
+
+    /* WIDE IMAGES */
+    .about-wide-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 32px auto;
+      width: 100%;
+    }
+    .about-wide-image img {
+      max-width: 1200px;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px 0 rgba(46,42,143,0.08);
+      background: transparent;
+    }
+    @media (max-width: 1200px) {
+      .about-wide-image img {max-width: 98vw; width: 98vw;}
+    }
+
+    /* PROJECTS */
+    .projects{padding:60px 40px;}
+    .section-header{text-align:center;margin-bottom:48px}
+    .section-header h3{font-size:36px;font-weight:700;margin:0;color:var(--navy)}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+    @media(max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){.grid{grid-template-columns:1fr}}
+
+    .card{
+      position: relative; /* <-- ADDED: keep absolute children inside the card */
+      background:linear-gradient(135deg,rgba(244,162,56,0.13) 0%,rgba(107,91,168,0.10) 100%);
+      border-radius:1.5em;
+      box-shadow:0 2px 16px 0 rgba(46,42,143,0.10);
+      overflow:hidden;
+      transition:transform 0.3s ease;
+    }
+    .card:hover{transform:translateY(-8px);}
+    /* safe fallback inside card */
+    .card-inner { position: relative; }
+
+    .card img {width: 100%; height: 220px; object-fit: cover; display: block;}
+    .card-body {padding: 20px; text-align: center;}
+    .card-title {font-size: 1.15em; font-weight: 700; color: var(--navy); margin: 0;}
+    .card-label {
+        font-size: 0.9em; 
+        color: #fff; 
+        background: var(--navy); 
+        padding: 6px 14px; 
+        border-radius: 20px; 
+        position: absolute; 
+        inset: 15px auto auto  auto; /* top:15px; right:15px; */
+        right: 15px;
+        white-space: nowrap;
+    }
+
+    /* FOOTER */
+    footer{
+      background:#111; color:#fff; padding:60px 0 0 0; margin-top:0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="header-inner">
+        <div class="brand">
+          <img src="images/vvit.png" alt="VVIT Logo" />
+          <span>VVIT</span>
+        </div>
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="events.html">Events</a>
+          <a href="calendar.html">Calendar</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="teams.html">Teams</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero" aria-label="Welcome to VVIT Innovation Council">
+      <h1>Igniting Innovation at VVIT</h1>
+      
+      <p class="subtitle">
+        Empowering students to transform ideas into reality. Join a vibrant community of creators, entrepreneurs, and problem-solvers shaping the future through technology and design.
+      </p>
+      
+      <div class="cta-group">
+        <a href="events.html" class="cta" aria-label="Explore Events">Explore Events</a>
+        <a href="contact.html" class="cta cta-secondary" aria-label="Join IIC">Join IIC</a>
+      </div>
+    </section>
+
+    <section class="activities-strip">
+        <h2 class="activities-title">Key Activities of IIC</h2>
+        
+        <div class="activities-row">
+            <div class="activity-item">
+                <div class="act-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                <div class="act-label">Workshops</div>
+            </div>
+            <div class="activity-item">
+                <div class="act-icon"><i class="fa-solid fa-person-rays"></i></div>
+                <div class="act-label">Alumni Talks</div>
+            </div>
+            <div class="activity-item">
+                <div class="act-icon"><i class="fa-solid fa-cube"></i></div>
+                <div class="act-label">Boot Camp</div>
+            </div>
+            <div class="activity-item">
+                <div class="act-icon"><i class="fa-solid fa-microchip"></i></div>
+                <div class="act-label">Hackathons</div>
+            </div>
+            <div class="activity-item">
+                <div class="act-icon">
+                    <i class="fa-regular fa-circle" style="font-size: 48px; border: 4px solid var(--navy); border-radius: 50%; padding: 5px;"></i>
+                </div>
+                <div class="act-label">Conclave</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider" role="separator" aria-hidden="true"></div>
+
+    <section class="about" id="about">
+      <div class="about-img">
+        <img src="images/IIC-Guided-Activities.png" alt="IIC Guided Activities Pyramid" />
+      </div>
+      <div class="about-content">
+        <div class="about-label">Who We Are</div>
+        <h2 id="about-title">A Catalyst for Creative Minds</h2>
+        <p>The Institutions Innovation Council (IIC) is an initiative of the Ministry of Education (MoE), Government of India, launched in collaboration with the All India Council for Technical Education (AICTE) in 2018. Its aim is to systematically cultivate a culture of innovation and entrepreneurship within India's Higher Education Institutions (HEIs)</p>
+        <p>
+          VVIT IIC is the campus epicenter for creative thinking and entrepreneurial action. Established under the Ministry of Education's initiative, we bridge the gap between classroom theory and real-world startups.
+        </p>
+        <p>
+          We provide the ecosystem, mentorship, and resources to turn your raw ideas into market-ready products. From ideation bootcamps to funding opportunities, IIC is your partner in the journey of innovation.
+        </p>
+        <a href="teams.html" class="cta-secondary" style="padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600;">Meet Our Team</a>
+      </div>
+    </section>
+
+    <section class="impact-section">
+        <div class="impact-grid">
+            <div class="impact-item">
+                <h3>25+</h3>
+                <p>Events Organized</p>
+            </div>
+            <div class="impact-item">
+                <h3>5+</h3>
+                <p>Startups Incubated</p>
+            </div>
+            <div class="impact-item">
+                <h3>1000+</h3>
+                <p>Students Impacted</p>
+            </div>
+            <div class="impact-item">
+                <h3>10+</h3>
+                <p>Industry Partners</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="about-wide-image">
+      <img src="images/policy-image.png" alt="Policy Approach & Action Plan" />
+    </div>
+
+    <div class="about-wide-image">
+      <img src="images/triangle.jpg" alt="National Innovation Contest" />
+    </div>
+
+    <section class="projects" id="projects">
+      <div class="section-header">
+        <h3>Featured Projects</h3>
+      </div>
+      <div class="grid">
+        <article class="card" tabindex="0">
+          <div class="card-inner">
+            <span class="card-label">IoT</span>
+            <img src="projects/image (1).png" alt="IoT-Based Healthcare" loading="lazy" />
+            <div class="card-body">
+              <h4 class="card-title">IoT-Based Healthcare System</h4>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" tabindex="0">
+          <div class="card-inner">
+            <span class="card-label">Solar</span>
+            <img src="projects/image (2).png" alt="Solar Water Purifier" loading="lazy" />
+            <div class="card-body">
+              <h4 class="card-title">Mobile Solar Water Purification</h4>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" tabindex="0">
+          <div class="card-inner">
+            <span class="card-label">Blockchain</span>
+            <img src="projects/image (3).png" alt="Blockchain Payment" loading="lazy" />
+            <div class="card-body">
+              <h4 class="card-title">Blockchain Payment System</h4>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer style="background:#111; color:#fff; padding:60px 0 0 0; margin-top:0;">
+      <div style="max-width:1200px;margin:0 auto;padding:0 24px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:40px 24px;">
+          <div>
+            <h4 style="font-size:20px;font-weight:700;margin-bottom:16px;">VVIT IIC</h4>
+            <p style="color:#bbb;line-height:1.7;font-size:15px;">Institution's Innovation Council (IIC) promotes innovation and entrepreneurship within academic institutions.</p>
+          </div>
+          <div>
+            <h5 style="font-size:15px;font-weight:600;margin-bottom:12px;">Shop</h5>
+            <ul style="list-style:none;padding:0;margin:0;">
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Sell online</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Features</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Examples</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Website editors</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Online retail</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 style="font-size:15px;font-weight:600;margin-bottom:12px;">Press</h5>
+            <ul style="list-style:none;padding:0;margin:0;">
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Events</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">News</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Awards</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Testimonials</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Online retail</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 style="font-size:15px;font-weight:600;margin-bottom:12px;">About</h5>
+            <ul style="list-style:none;padding:0;margin:0;">
+              <li><a href="#contact" style="color:#bbb;display:block;padding:4px 0;">Contact</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Services</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Team</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Career</a></li>
+              <li><a href="#" style="color:#bbb;display:block;padding:4px 0;">Contacts</a></li>
+            </ul>
+          </div>
+        </div>
+        <hr style="border:0;border-top:1px solid #222;margin:40px 0 24px 0">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;">
+          <div style="display:flex;gap:24px;flex-wrap:wrap;">
+            <a href="#" style="color:#bbb;font-size:14px;">Privacy Policy</a>
+            <a href="#" style="color:#bbb;font-size:14px;">Terms &amp; Conditions</a>
+            <a href="#" style="color:#bbb;font-size:14px;">Code of Conduct</a>
+          </div>
+          <div style="display:flex;gap:16px;">
+            <a href="#" aria-label="Twitter" style="color:#bbb;font-size:18px;"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram" style="color:#bbb;font-size:18px;"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Facebook" style="color:#bbb;font-size:18px;"><i class="fab fa-facebook"></i></a>
+            <a href="#" aria-label="Pinterest" style="color:#bbb;font-size:18px;"><i class="fab fa-pinterest"></i></a>
+          </div>
+        </div>
+        <p style="color:#888;font-size:14px;margin:32px 0 0 0;">&copy; <span id="year"></span> Institution's Innovation Council. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
